@@ -29,41 +29,49 @@ void shutdonwLights() { // Make the lighs go to shuts down after 0.5s
   R = 255; G = 255;  B = 255;
   analogWrite(6, R); analogWrite(3, G); analogWrite(5, B);
 }
-void letThereBeLight() { // A cool rgb lights
+bool charCheck(){
+ char newkey = keypad.getKey(); //check witch key your are clicking before the loop starts again so you should spam this keypad to leave this mode
+ if (newkey != 0) { // why the 0 is not in "", I don't know to be honst (as long it's working I will not change it because why not?)
+  return true;
+ }
+ return false;
+}
+//* Lights RGB FUNCTIONS
+void rgbLights1() {
   for (int i = 0; i < 255; i++) {
     delay(1);
     analogWrite(3, 255);
-    delay(1);
-    analogWrite(5, 0 + i);
+    analogWrite(5, i);
     delay(1);
     analogWrite(6, 255 - i);
-    delay(1);
   }
+}
+void rgbLights2() {
   for (int i = 0; i < 255; i++) {
     delay(1);
     analogWrite(3, 255 - i);
     delay(1);
     analogWrite(5, 255);
-    delay(1);
-    analogWrite(6, 0 + i);
-    delay(1);
+    analogWrite(6, i);
   }
+}
+void rgbLights3() {
   for (int i = 0; i < 255; i++) {
     delay(1);
-    analogWrite(3, 0 + i);
-    delay(1);
+    analogWrite(3, i);
     analogWrite(5, 255 - i);
     delay(1);
     analogWrite(6, 255);
-    delay(1);
   }
 }
 void loop(){
   char key = keypad.getKey(); //check the key you are clicking
   if(key == '#'){ //turn on/off spam mode
     spam = false;
+    shutdonwLights();
   }else if(key == '*'){
     spam = true;
+    shutdonwLights();
   }
   if (spam){
    if (key){ //to check if the key been hold
@@ -77,12 +85,12 @@ void loop(){
       if ((millis() - t_hold) > 100 ) { // cool function check if holding key all way down
         for (int i = 0; i < 10; i++) { //You can use switch here will work as same.
           if (holdKey == '0' + i) { //check witch key you are clicking
-            holdNumber[i] = 1; //This is check witch key you are clicking and make it one
+            holdNumber[i] = 1; //This is they key you are clicking?? make it one
           } else {
             holdNumber[i] = 0; //else? make it 0
           }
         }
-        t_hold = millis(); // Store the current time in milliseconds
+        t_hold = millis(); // Store the current time in milliseconds (no i will not sell your data)
       }
     }else{
       for (int i = 0; i < 10; i++) {
@@ -102,16 +110,19 @@ void loop(){
         case '8': R = 55;  G = 155; B = 255; break;
         case '9': R = 138; G = 43;  B = 226; break;
         case '0':
-        unsigned long startTime = millis();
-        while (true) { //keep playing in the background untill i click another number
-          char newkey = keypad.getKey(); //check witch key your are clicking before the loop starts again so you should spam this keypad to leave this mode
-          if (newkey != 0) {
+        while (true) {
+          if (charCheck()) { //this thing make the code leave the rgb mode
             break;
           }
-          if (millis() - startTime > 2000) {
-            startTime = millis(); //2 secound cool down so the user get a chance to chnage the lights
-            letThereBeLight();
+          rgbLights1(); //* RGB ONE
+          if (charCheck()) {
+            break;
           }
+          rgbLights2(); //* RGB TWO
+          if (charCheck()) {
+            break;
+          }
+          rgbLights3(); //* RGB three
         }
         break;
       }
@@ -123,9 +134,13 @@ void loop(){
   }
   //This thing here see witch number your holding and disable it
   if (holdNumber[0] == 1){
-    letThereBeLight();
+    rgbLights1();
+    rgbLights2();
+    rgbLights3();
     analogWrite(6, R); analogWrite(3, G); analogWrite(5, B); //COLOR OF NUMBER 0
-    shutdonwLights();
+    if (holdNumber[0] != 1){ // this for Taking your finger off the key will reset the number, but not the lights
+      shutdonwLights(); //turn off lights function
+    }
   }else if(holdNumber[1] == 1){
     R = 255; G = 0;   B = 0;
     analogWrite(6, R); analogWrite(3, G); analogWrite(5, B); //COLOR OF NUMBER 1
