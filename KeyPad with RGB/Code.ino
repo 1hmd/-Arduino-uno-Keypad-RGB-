@@ -90,7 +90,7 @@ void loop(){
             holdNumber[i] = 0; //else? make it 0
           }
         }
-        t_hold = millis(); // Store the current time in milliseconds (no i will not sell your data)
+        t_hold = millis(); // Store the current time in milliseconds 
       }
     }else{
       for (int i = 0; i < 10; i++) {
